@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<!-- email : admin@pustaka.com -->
+<!-- password : adminpustaka -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistem Manajemen Perpustakaan - Kelola koleksi buku dan peminjaman dengan mudah">
+    <meta name="theme-color" content="#0db9f2">
+    <title>MyLibrary - Sistem Manajemen Perpustakaan</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Symbols Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/toast.css">
+    <link rel="stylesheet" href="assets/css/toolbar.css">
+</head>
+
+<body>
+
+    <!-- Global Loading Overlay -->
+    <div id="global-loader" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- ========================================
+         AUTH SECTION - Login Page
+         ======================================== -->
+    <section id="auth-section" class="flex-center">
+        <div class="login-card">
+            <h1>📚 MyLibrary</h1>
+            <p>Selamat datang! Silakan login untuk mengelola perpustakaan.</p>
+            <form id="login-form">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" name="email" placeholder="Masukkan email Anda" required>
+
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" name="password" placeholder="Masukkan password" required>
+
+                <button type="submit" class="btn-primary full-width">
+                    <span>Masuk ke Dashboard</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ========================================
+         DASHBOARD SECTION - Sidebar Layout
+         ======================================== -->
+    <section id="dashboard-section" style="display: none;">
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                </div>
+                <h2 class="sidebar-brand">MyLibrary</h2>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-target="tab-master">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Master Data Buku</span>
+                </button>
+                <button class="nav-item" data-target="tab-peminjam">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Data Peminjam</span>
+                </button>
+                <button class="nav-item" data-target="tab-katalog">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    <span>Katalog</span>
+                </button>
+                <button class="nav-item" data-target="tab-history">
+                    <span class="material-symbols-outlined">history</span>
+                    <span>History</span>
+                </button>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <span class="material-symbols-outlined">person</span>
+                        </div>
+                        <div class="user-details">
+                            <h3 id="user-name">Admin</h3>
+                            <p id="user-email">user@email.com</p>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="user-action" id="btn-change-password">
+                            <span class="material-symbols-outlined">lock</span>
+                            <span>Ubah Password</span>
+                        </button>
+                    </div>
+                </div>
+                <button id="btn-logout" class="btn-logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobile-menu-btn"
+                    style="background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                    <span class="material-symbols-outlined"
+                        style="font-size: 2.5rem !important; color: var(--primary) !important;">menu</span>
+                </button>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Tab: Master Data Buku -->
+                <div id="tab-master" class="tab-content active">
+                    <!-- Page Heading -->
+                    <div class="page-heading">
+                        <h1>Dashboard Buku</h1>
+                        <p id="dashboard-subtitle">Mengelola koleksi perpustakaan Anda.</p>
+                    </div>
+
+                    <!-- Toolbar: Search & Add Button -->
+                    <div class="toolbar">
+                        <div class="search-container" style="flex: 1; max-width: 400px;">
+                            <span class="material-symbols-outlined">search</span>
+                            <input type="text" class="search-input" id="search-input"
+                                placeholder="Cari judul buku, penulis, atau kategori...">
+                        </div>
+                        <button class="btn-add-book" id="btn-add-buku">
+                            <span class="material-symbols-outlined">add</span>
+                            <span>Tambah Buku</span>
+                        </button>
+                    </div>
+
+                    <!-- Stats Card - Total Books Only -->
+                    <div class="stats-card" style="max-width: 280px; margin-bottom: var(--spacing-xl);">
+                        <div class="stats-header">
+                            <span class="material-symbols-outlined stats-icon">library_books</span>
+                        </div>
+                        <div class="stats-body">
+                            <p class="stats-label">Total Buku</p>
+                            <h3 class="stats-value" id="total-books">0</h3>
+                        </div>
+                    </div>
+
+                    <!-- Books Grid -->
+                    <div class="section-header">
+                        <h2>Koleksi Buku</h2>
+                    </div>
+                    <div id="list-buku" class="grid-container"></div>
+                </div>
+
+                <!-- Tab: Data Peminjam -->
+                <div id="tab-peminjam" class="tab-content">
+                    <div class="page-heading">
+                        <h1>Data Peminjam</h1>
+                        <p>Mengelola peminjaman buku aktif.</p>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Peminjaman Aktif</h2>
+                    </div>
+                    <div id="list-peminjam" class="list-container"></div>
+                </div>
+
+                <!-- Tab: Katalog Tersedia -->
+                <div id="tab-katalog" class="tab-content">
+                    <div class="page-heading">
+                        <h1>Katalog Tersedia</h1>
+                        <p>Jelajahi buku yang tersedia untuk dipinjam.</p>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Buku Tersedia</h2>
+                    </div>
+                    <div id="list-katalog" class="grid-container"></div>
+                </div>
+
+                <!-- Tab: History Peminjaman -->
+                <div id="tab-history" class="tab-content">
+                    <div class="page-heading">
+                        <h1>Riwayat Peminjaman</h1>
+                        <p>Riwayat lengkap buku yang telah dikembalikan.</p>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Peminjaman Selesai</h2>
+                    </div>
+                    <div id="list-history" class="list-container"></div>
+                </div>
+            </div>
+        </main>
+
+    </section>
+
+    <!-- ========================================
+         MODALS
+         ======================================== -->
+
+    <!-- Modal: Tambah/Edit Buku -->
+    <div id="modal-buku" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>📖 Tambah Buku Baru</h2>
+            <form id="form-buku">
+                <label for="input-judul">Judul Buku</label>
+                <input type="text" id="input-judul" name="judul" placeholder="Masukkan judul buku" required>
+
+                <label for="input-penulis">Penulis</label>
+                <input type="text" id="input-penulis" name="penulis" placeholder="Nama penulis buku" required>
+
+                <div class="row">
+                    <div>
+                        <label for="input-tahun">Tahun Terbit</label>
+                        <input type="number" id="input-tahun" name="tahun" placeholder="2024" required>
+                    </div>
+                    <div>
+                        <label for="input-stok">Stok Buku</label>
+                        <input type="number" id="input-stok" name="stok" placeholder="1" min="0" value="1" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="input-kategori">Kategori</label>
+                        <input type="text" id="input-kategori" name="kategori" placeholder="Fiksi, Non-Fiksi, dll"
+                            required>
+                    </div>
+                    <div>
+                        <label for="input-status">Status Buku</label>
+                        <select id="input-status" name="status_buku" required>
+                            <option value="tersedia">Tersedia</option>
+                            <option value="tidak_tersedia">Tidak Tersedia</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label for="input-gambar">URL Gambar Cover</label>
+                <input type="url" id="input-gambar" name="gambar" placeholder="https://example.com/cover.jpg" required>
+
+                <button type="submit" class="btn-primary full-width">
+                    <span class="material-symbols-outlined">save</span>
+                    <span>Simpan Buku</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Form Peminjaman -->
+    <div id="modal-pinjam" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>👤 Data Peminjam</h2>
+            <form id="form-pinjam">
+                <label for="input-nama-peminjam">Nama Lengkap Peminjam</label>
+                <input type="text" id="input-nama-peminjam" name="nama_peminjam" placeholder="Masukkan nama lengkap"
+                    required>
+
+                <label for="input-jaminan">Jenis Jaminan</label>
+                <select id="input-jaminan" name="jaminan" required>
+                    <option value="" disabled selected>-- Pilih Jaminan --</option>
+                    <option value="KTP">KTP (Kartu Tanda Penduduk)</option>
+                    <option value="KTM">KTM (Kartu Tanda Mahasiswa)</option>
+                    <option value="SIM">SIM (Surat Izin Mengemudi)</option>
+                </select>
+
+                <label for="input-tgl-kembali">Tanggal Pengembalian</label>
+                <input type="date" id="input-tgl-kembali" name="tgl_kembali" required>
+
+                <button type="submit" class="btn-primary full-width">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>Proses Peminjaman</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Konfirmasi -->
+    <div id="modal-confirm" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-icon" style="margin-bottom: 1.5rem; color: var(--danger);">
+                <span class="material-symbols-outlined" style="font-size: 48px;">warning</span>
+            </div>
+            <h2 style="border: none; padding: 0; margin-bottom: 1rem;">Konfirmasi</h2>
+            <p id="confirm-message" style="margin-bottom: 2rem; color: var(--text-secondary);">Apakah Anda yakin ingin
+                melakukan tindakan ini?</p>
+
+            <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="btn-confirm-cancel" class="btn-secondary" style="flex: 1;">Batal</button>
+                <button id="btn-confirm-yes" class="btn-danger" style="flex: 1;">Ya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ubah Password -->
+    <div id="modal-change-password" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal">&times;</span>
+            <h2>🔒 Ubah Password</h2>
+            <form id="form-change-password">
+                <label for="current-password">Password Saat Ini</label>
+                <input type="password" id="current-password" name="current_password"
+                    placeholder="Masukkan password saat ini" required>
+
+                <label for="new-password">Password Baru</label>
+                <input type="password" id="new-password" name="new_password"
+                    placeholder="Masukkan password baru (min. 6 karakter)" minlength="6" required>
+
+                <label for="confirm-password">Konfirmasi Password Baru</label>
+                <input type="password" id="confirm-password" name="confirm_password" placeholder="Ulangi password baru"
+                    minlength="6" required>
+
+                <button type="submit" class="btn-primary full-width">
+                    <span class="material-symbols-outlined">lock</span>
+                    <span>Simpan Password</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application Script -->
+    <script type="module" src="assets/js/main.js"></script>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('open');
+                    sidebarOverlay.classList.toggle('active');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function () {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
+
+            // Update navigation to use new nav-item class
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const target = this.getAttribute('data-target');
+
+                    // Remove active from all nav items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    // Add active to clicked item
+                    this.classList.add('active');
+
+                    // Hide all tab contents
+                    tabContents.forEach(tab => tab.classList.remove('active'));
+                    // Show target tab
+                    const targetTab = document.getElementById(target);
+                    if (targetTab) {
+                        targetTab.classList.add('active');
+                    }
+
+                    // Close mobile sidebar
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

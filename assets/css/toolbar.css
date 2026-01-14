@@ -1,0 +1,19 @@
+/* ========================================
+   Toolbar - For Page Actions
+   ======================================== */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    background: var(--glass-bg);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+}
+
+.toolbar .search-container {
+    margin: 0;
+}
