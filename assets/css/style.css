@@ -380,6 +380,11 @@ body {
     gap: var(--spacing-lg);
 }
 
+/* Mobile menu button - hidden on desktop */
+.mobile-menu-btn {
+    display: none;
+}
+
 /* Search Bar */
 .search-container {
     position: relative;
