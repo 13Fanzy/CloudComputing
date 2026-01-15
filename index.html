@@ -129,11 +129,9 @@
         <main class="main-content">
             <!-- Top Header Bar -->
             <header class="top-header">
-                <!-- Mobile Menu Button -->
-                <button class="mobile-menu-btn" id="mobile-menu-btn"
-                    style="background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
-                    <span class="material-symbols-outlined"
-                        style="font-size: 2.5rem !important; color: var(--primary) !important;">menu</span>
+                <!-- Mobile Menu Button - Only visible on mobile -->
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <span class="material-symbols-outlined">menu</span>
                 </button>
             </header>
 
@@ -149,7 +147,7 @@
 
                     <!-- Toolbar: Search & Add Button -->
                     <div class="toolbar">
-                        <div class="search-container" style="flex: 1; max-width: 400px;">
+                        <div class="search-container">
                             <span class="material-symbols-outlined">search</span>
                             <input type="text" class="search-input" id="search-input"
                                 placeholder="Cari judul buku, penulis, atau kategori...">

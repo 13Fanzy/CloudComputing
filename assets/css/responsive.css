@@ -112,7 +112,8 @@
         width: 100%;
     }
 
-    /* Mobile menu button */
+    /* Mobile menu button - show on mobile */
+    .mobile-menu-btn,
     #mobile-menu-btn.mobile-menu-btn {
         display: flex !important;
         width: 3rem;
@@ -123,16 +124,14 @@
         border-radius: var(--radius-lg);
         align-items: center;
         justify-content: center;
-        color: var(--primary);
         cursor: pointer;
         padding: 0 !important;
         margin-right: auto;
-        /* Align to left */
     }
 
-    #mobile-menu-btn .material-symbols-outlined {
-        font-size: 2.2rem;
-        color: var(--primary) !important;
+    .mobile-menu-btn .material-symbols-outlined {
+        font-size: 2rem;
+        color: var(--primary);
     }
 
     /* Top Header */
