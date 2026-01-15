@@ -5,15 +5,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-xl);
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     background: var(--glass-bg);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-2xl);
     border: 1px solid var(--glass-border);
 }
 
 .toolbar .search-container {
+    flex: 1;
+    max-width: 550px;
     margin: 0;
+}
+
+.toolbar .btn-add-book {
+    flex-shrink: 0;
 }
