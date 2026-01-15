@@ -385,42 +385,94 @@ body {
     display: none !important;
 }
 
-/* Search Bar */
+/* Search Bar - Modern Glassmorphism Style */
 .search-container {
     position: relative;
     flex: 1;
     max-width: 500px;
 }
 
+.search-container::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, rgba(13, 185, 242, 0.3), rgba(99, 102, 241, 0.3), rgba(13, 185, 242, 0.3));
+    border-radius: calc(var(--radius-xl) + 2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.search-container:focus-within::before {
+    opacity: 1;
+    animation: borderGlow 2s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
 .search-container .material-symbols-outlined {
     position: absolute;
-    left: var(--spacing-md);
+    left: var(--spacing-lg);
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.search-container:focus-within .material-symbols-outlined {
+    color: var(--primary);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .search-input {
     width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-xl);
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 3rem;
+    padding: var(--spacing-md) var(--spacing-xl) var(--spacing-md) 3.25rem;
     color: var(--text-light);
     font-size: var(--font-size-base);
-    transition: all var(--transition-base);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .search-input::placeholder {
     color: var(--text-muted);
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+.search-input:hover {
+    border-color: rgba(13, 185, 242, 0.3);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 1));
 }
 
 .search-input:focus {
     outline: none;
-    border-color: rgba(13, 185, 242, 0.5);
-    box-shadow: 0 0 0 3px rgba(13, 185, 242, 0.1);
+    border-color: rgba(13, 185, 242, 0.6);
+    box-shadow: 
+        0 0 0 4px rgba(13, 185, 242, 0.15),
+        0 10px 25px -5px rgba(13, 185, 242, 0.2),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 1), rgba(15, 23, 42, 1));
+}
+
+.search-input:focus::placeholder {
+    color: var(--primary);
+    opacity: 0.6;
 }
 
 /* Header Actions */
