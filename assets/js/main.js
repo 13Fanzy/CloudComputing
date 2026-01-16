@@ -18,6 +18,24 @@ let currentUser = null;
 let currentBukuIdToLoan = null; // Temp storage for modal
 let currentEditBukuId = null; // Temp storage for edit
 
+// Helper function to open modal with Tailwind
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('!flex');
+    }
+}
+
+// Helper function to close modal with Tailwind
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('!flex');
+    }
+}
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Load Quote (optional, hidden in new design)
@@ -29,7 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (user) {
             currentUser = user;
             document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'flex';
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('flex');
 
             // Update user name in sidebar
             const userNameEl = document.getElementById('user-name');
@@ -46,7 +65,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadMasterData(); // Default load
         } else {
             document.getElementById('auth-section').style.display = 'flex';
-            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('flex');
         }
     });
 
@@ -152,7 +172,7 @@ function setupEventListeners() {
         currentEditBukuId = null;
         document.querySelector('#modal-buku h2').textContent = '📖 Tambah Buku Baru';
         document.getElementById('form-buku').reset();
-        document.getElementById('modal-buku').classList.add('active');
+        openModal('modal-buku');
     });
 
     // Form: Submit Buku (Add or Update)
@@ -178,7 +198,7 @@ function setupEventListeners() {
                 showToast('Buku berhasil ditambahkan');
             }
 
-            document.getElementById('modal-buku').classList.remove('active');
+            closeModal('modal-buku');
             e.target.reset();
             currentEditBukuId = null; // Reset
             loadMasterData();
@@ -209,7 +229,7 @@ function setupEventListeners() {
                 form.status_buku.value = book.status_buku || 'tersedia';
 
                 document.querySelector('#modal-buku h2').textContent = '✏️ Edit Buku';
-                document.getElementById('modal-buku').classList.add('active');
+                openModal('modal-buku');
             } catch (err) {
                 showToast(err, 'error');
             } finally {
@@ -244,7 +264,7 @@ function setupEventListeners() {
             form.status_buku.value = book.status_buku || 'tersedia';
 
             document.querySelector('#modal-buku h2').textContent = '✏️ Edit Buku';
-            document.getElementById('modal-buku').classList.add('active');
+            openModal('modal-buku');
         } catch (err) {
             showToast(err, 'error');
         }
@@ -261,10 +281,10 @@ function setupEventListeners() {
 
     // 2. Katalog List Actions (Pinjamkan)
     document.getElementById('list-katalog').addEventListener('click', async (e) => {
-        const pinjamBtn = e.target.closest('.btn-pinjam');
+        const pinjamBtn = e.target.closest('button[data-id]');
         if (pinjamBtn && !pinjamBtn.disabled) {
             currentBukuIdToLoan = pinjamBtn.dataset.id;
-            document.getElementById('modal-pinjam').classList.add('active');
+            openModal('modal-pinjam');
         }
     });
 
@@ -279,7 +299,7 @@ function setupEventListeners() {
         try {
             await peminjamService.pinjamBuku(data, currentBukuIdToLoan);
             showToast('Peminjaman berhasil dicatat');
-            document.getElementById('modal-pinjam').classList.remove('active');
+            closeModal('modal-pinjam');
             e.target.reset();
             loadKatalogData(); // Refresh katalog display
             loadMasterData(); // Also refresh master for stock update
@@ -290,7 +310,7 @@ function setupEventListeners() {
 
     // 4. Kembalikan Buku Action
     document.getElementById('list-peminjam').addEventListener('click', async (e) => {
-        const kembalikanBtn = e.target.closest('.btn-kembalikan');
+        const kembalikanBtn = e.target.closest('button[data-id]');
         if (kembalikanBtn) {
             const loanId = kembalikanBtn.dataset.id;
             const bukuCustomId = kembalikanBtn.dataset.bukuid;
@@ -312,7 +332,21 @@ function setupEventListeners() {
     // Close Modals
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.target.closest('.modal-overlay').classList.remove('active');
+            const modal = e.target.closest('.modal-overlay');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('!flex');
+            }
+        });
+    });
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('!flex');
+            }
         });
     });
 
@@ -350,7 +384,7 @@ function setupEventListeners() {
     if (btnChangePassword) {
         btnChangePassword.addEventListener('click', () => {
             document.getElementById('form-change-password').reset();
-            document.getElementById('modal-change-password').classList.add('active');
+            openModal('modal-change-password');
         });
     }
 
@@ -382,7 +416,7 @@ function setupEventListeners() {
             await updatePassword(currentUser, newPassword);
 
             showToast('Password berhasil diperbarui!');
-            document.getElementById('modal-change-password').classList.remove('active');
+            closeModal('modal-change-password');
             e.target.reset();
         } catch (error) {
             let errorMessage = 'Gagal memperbarui password: ';

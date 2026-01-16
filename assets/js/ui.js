@@ -7,14 +7,20 @@ export const ui = {
         const content = data.content || data.quote || "Membaca adalah jendela dunia.";
         const author = data.author || "Anonim";
         el.innerHTML = `
-            <blockquote>"${content}"</blockquote>
-            <cite>— ${author}</cite>
+            <blockquote class="text-lg italic text-slate-300">"${content}"</blockquote>
+            <cite class="text-sm text-slate-500">— ${author}</cite>
         `;
     },
 
     toggleLoading(show) {
         const loader = document.getElementById('global-loader');
-        loader.style.display = show ? 'flex' : 'none';
+        if (show) {
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+        } else {
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }
     },
 
     updateDashboardStats(totalBooks, totalBorrowed) {
@@ -49,14 +55,15 @@ export const ui = {
 
         if (books.length === 0) {
             const emptyMessage = mode === 'admin'
-                ? '<p style="margin-top: 0.5rem; font-size: 0.875rem;">Klik tombol "Add New Book" untuk menambahkan koleksi baru.</p>'
+                ? '<p class="mt-2 text-sm">Klik tombol "Add New Book" untuk menambahkan koleksi baru.</p>'
                 : mode === 'katalog'
-                    ? '<p style="margin-top: 0.5rem; font-size: 0.875rem;">Tidak ada buku tersedia untuk dipinjam.</p>'
+                    ? '<p class="mt-2 text-sm">Tidak ada buku tersedia untuk dipinjam.</p>'
                     : '';
 
             container.innerHTML = `
-                <div class="empty-state">
-                    <span>Belum ada data buku.</span>
+                <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+                    <span class="material-symbols-outlined text-6xl mb-4 text-slate-600">library_books</span>
+                    <span class="text-lg font-medium">Belum ada data buku.</span>
                     ${emptyMessage}
                 </div>
             `;
@@ -65,24 +72,26 @@ export const ui = {
 
         books.forEach(buku => {
             const card = document.createElement('div');
-            card.className = 'card-buku';
+            card.className = 'group bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-cyan-500/30 relative overflow-hidden';
 
             // Determine book status from status_buku field (default to 'tersedia' if not set)
             const statusBuku = buku.status_buku || 'tersedia';
             const isAvailable = statusBuku === 'tersedia';
-            let statusClass = isAvailable ? 'available' : 'borrowed';
+            let statusClass = isAvailable 
+                ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' 
+                : 'bg-cyan-500/20 border-cyan-500/30 text-cyan-400';
             let statusText = isAvailable ? 'Tersedia' : 'Tidak Tersedia';
 
             // Generate hover action buttons for admin mode
             let hoverActions = '';
             if (mode === 'admin') {
                 hoverActions = `
-                    <div class="card-hover-actions">
-                        <button class="card-hover-btn" data-id="${buku.id}" data-action="edit" title="Edit buku">
-                            <span class="material-symbols-outlined">edit</span>
+                    <div class="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm border-none text-white flex items-center justify-center cursor-pointer transition-colors hover:text-cyan-400" data-id="${buku.id}" data-action="edit" title="Edit buku">
+                            <span class="material-symbols-outlined text-sm">edit</span>
                         </button>
-                        <button class="card-hover-btn delete" data-id="${buku.id}" data-action="delete" title="Hapus buku">
-                            <span class="material-symbols-outlined">delete</span>
+                        <button class="w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-sm border-none text-white flex items-center justify-center cursor-pointer transition-colors hover:text-red-400" data-id="${buku.id}" data-action="delete" title="Hapus buku">
+                            <span class="material-symbols-outlined text-sm">delete</span>
                         </button>
                     </div>
                 `;
@@ -92,9 +101,9 @@ export const ui = {
             let cardActions = '';
             if (mode === 'katalog') {
                 cardActions = `
-                    <div class="card-actions">
-                        <button class="btn-primary btn-pinjam full-width" data-id="${buku.id}" data-title="${buku.judul}">
-                            <span class="material-symbols-outlined">person_add</span>
+                    <div class="mt-4">
+                        <button class="w-full py-2.5 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 flex items-center justify-center gap-2 text-sm" data-id="${buku.id}" data-title="${buku.judul}">
+                            <span class="material-symbols-outlined text-lg">person_add</span>
                             <span>Pinjamkan Buku</span>
                         </button>
                     </div>
@@ -102,33 +111,32 @@ export const ui = {
             }
 
             // Status meta item
-            const statusMetaClass = isAvailable ? 'status-available' : 'status-unavailable';
             const stockCount = buku.stok || 0;
 
             card.innerHTML = `
-                <div class="card-img">
-                    <img src="${buku.gambar_buku || 'https://via.placeholder.com/200x300?text=No+Cover'}" alt="${buku.judul}" loading="lazy">
+                <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-slate-700 to-slate-800 shadow-lg">
+                    <img src="${buku.gambar_buku || 'https://via.placeholder.com/200x300?text=No+Cover'}" alt="${buku.judul}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                     ${hoverActions}
-                    <span class="book-status ${statusClass}">${statusText}</span>
+                    <span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase backdrop-blur-lg border ${statusClass}">${statusText}</span>
                 </div>
-                <div class="card-body">
-                    <h3 title="${buku.judul}">${buku.judul}</h3>
-                    <p class="author">${buku.penulis}</p>
-                    <div class="card-meta">
-                        <span class="card-meta-item">
-                            <span class="material-symbols-outlined">calendar_month</span>
+                <div class="flex-1 flex flex-col">
+                    <h3 class="text-sm font-semibold text-white mb-0.5 line-clamp-1" title="${buku.judul}">${buku.judul}</h3>
+                    <p class="text-slate-400 text-xs mb-2">${buku.penulis}</p>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        <span class="inline-flex items-center gap-0.5 text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">
+                            <span class="material-symbols-outlined text-[11px]">calendar_month</span>
                             ${buku.tahun_terbit}
                         </span>
-                        <span class="card-meta-item">
-                            <span class="material-symbols-outlined">category</span>
+                        <span class="inline-flex items-center gap-0.5 text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">
+                            <span class="material-symbols-outlined text-[11px]">category</span>
                             ${buku.kategori_buku}
                         </span>
-                        <span class="card-meta-item">
-                            <span class="material-symbols-outlined">inventory_2</span>
+                        <span class="inline-flex items-center gap-0.5 text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">
+                            <span class="material-symbols-outlined text-[11px]">inventory_2</span>
                             Stok: ${stockCount}
                         </span>
-                        <span class="card-meta-item ${statusMetaClass}">
-                            <span class="material-symbols-outlined">${isAvailable ? 'check_circle' : 'cancel'}</span>
+                        <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded ${isAvailable ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}">
+                            <span class="material-symbols-outlined text-[11px]">${isAvailable ? 'check_circle' : 'cancel'}</span>
                             ${statusText}
                         </span>
                     </div>
@@ -168,9 +176,10 @@ export const ui = {
 
         if (loans.length === 0) {
             container.innerHTML = `
-                <div class="empty-state">
-                    <span>Tidak ada peminjaman aktif.</span>
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Semua buku sudah dikembalikan. 🎉</p>
+                <div class="flex flex-col items-center justify-center py-16 text-slate-400">
+                    <span class="material-symbols-outlined text-6xl mb-4 text-slate-600">group</span>
+                    <span class="text-lg font-medium">Tidak ada peminjaman aktif.</span>
+                    <p class="mt-2 text-sm">Semua buku sudah dikembalikan. 🎉</p>
                 </div>
             `;
             return;
@@ -178,8 +187,7 @@ export const ui = {
 
         loans.forEach(loan => {
             const card = document.createElement('div');
-            card.className = 'card-peminjam';
-
+            
             // Format Tanggal
             const tglKembali = loan.tanggal_pengembalian.toDate().toLocaleDateString('id-ID', {
                 weekday: 'long',
@@ -190,33 +198,32 @@ export const ui = {
 
             // Check if overdue
             const isOverdue = loan.tanggal_pengembalian.toDate() < new Date();
+            const borderColor = isOverdue ? 'border-l-red-500' : 'border-l-cyan-500';
 
-            if (isOverdue) {
-                card.style.borderLeftColor = 'var(--danger)';
-            }
+            card.className = `bg-white/[0.03] backdrop-blur-xl border border-white/10 ${borderColor} border-l-4 p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 transition-all duration-300 hover:translate-x-1 hover:bg-white/[0.05]`;
 
             card.innerHTML = `
-                <div class="loan-info">
-                    <h4>
-                        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 6px; font-size: 1.25rem;">person</span>
+                <div class="flex-1 min-w-[200px]">
+                    <h4 class="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">person</span>
                         ${loan.nama_peminjam}
                     </h4>
-                    <p>
-                        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 4px; font-size: 1rem;">menu_book</span>
-                        Meminjam: <strong>${loan.judul_buku}</strong>
+                    <p class="text-slate-300 text-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">menu_book</span>
+                        Meminjam: <strong class="text-white">${loan.judul_buku}</strong>
                     </p>
-                    <p class="meta">
-                        <span>
-                            <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 0.875rem;">credit_card</span>
+                    <div class="mt-3 pt-3 border-t border-white/5 text-xs text-slate-400 flex flex-wrap gap-4">
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">credit_card</span>
                             Jaminan: ${loan.jaminan}
                         </span>
-                        <span style="margin-left: 1rem; ${isOverdue ? 'color: var(--danger); font-weight: 600;' : ''}">
-                            <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 0.875rem;">schedule</span>
+                        <span class="flex items-center gap-1 ${isOverdue ? 'text-red-400 font-semibold' : ''}">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
                             ${isOverdue ? '⚠️ TERLAMBAT - ' : ''}Kembali: ${tglKembali}
                         </span>
-                    </p>
+                    </div>
                 </div>
-                <button class="btn-success btn-kembalikan" data-id="${loan.id}" data-bukuid="${loan.buku_id}">
+                <button class="py-2.5 px-5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 whitespace-nowrap" data-id="${loan.id}" data-bukuid="${loan.buku_id}">
                     <span class="material-symbols-outlined">check_circle</span>
                     <span>Kembalikan</span>
                 </button>
@@ -232,8 +239,9 @@ export const ui = {
 
         if (loans.length === 0) {
             container.innerHTML = `
-                <div class="empty-state">
-                    <span>Belum ada riwayat peminjaman.</span>
+                <div class="flex flex-col items-center justify-center py-16 text-slate-400">
+                    <span class="material-symbols-outlined text-6xl mb-4 text-slate-600">history</span>
+                    <span class="text-lg font-medium">Belum ada riwayat peminjaman.</span>
                 </div>
             `;
             return;
@@ -241,7 +249,7 @@ export const ui = {
 
         loans.forEach(loan => {
             const card = document.createElement('div');
-            card.className = 'card-history';
+            card.className = 'bg-white/[0.03] backdrop-blur-xl border border-white/10 border-l-4 border-l-emerald-500 p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 transition-all duration-300 hover:bg-white/[0.05]';
 
             // Format Tanggal
             const tglKembali = loan.tanggal_pengembalian ? loan.tanggal_pengembalian.toDate().toLocaleDateString('id-ID', {
@@ -272,31 +280,31 @@ export const ui = {
 
             let statusBadge = '';
             if (isLate) {
-                statusBadge = `<span style="color: var(--danger); font-weight: 700;">⚠️ Terlambat ${diffDays} Hari</span>`;
+                statusBadge = `<span class="text-red-400 font-bold">⚠️ Terlambat ${diffDays} Hari</span>`;
             } else {
-                statusBadge = `<span style="color: var(--success); font-weight: 700;">✅ Tepat Waktu</span>`;
+                statusBadge = `<span class="text-emerald-400 font-bold">✅ Tepat Waktu</span>`;
             }
 
             card.innerHTML = `
-                <div class="loan-info">
-                    <h4>
-                        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 6px; font-size: 1.25rem;">person</span>
+                <div class="flex-1 min-w-[200px]">
+                    <h4 class="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">person</span>
                         ${loan.nama_peminjam}
                     </h4>
-                    <p>
-                        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 4px; font-size: 1rem;">menu_book</span>
-                        Meminjam: <strong>${loan.judul_buku}</strong>
+                    <p class="text-slate-300 text-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">menu_book</span>
+                        Meminjam: <strong class="text-white">${loan.judul_buku}</strong>
                     </p>
-                    <p class="meta">
+                    <div class="mt-3 pt-3 border-t border-white/5 text-xs text-slate-400 flex flex-wrap gap-4">
                         <span>Batas: ${tglKembali}</span>
-                        <span style="margin-left: 1rem;">Dikembalikan: ${tglReal}</span>
-                    </p>
-                    <p class="meta" style="margin-top: 0.5rem; border: none;">
+                        <span>Dikembalikan: ${tglReal}</span>
+                    </div>
+                    <div class="mt-2 text-xs">
                         ${statusBadge}
-                    </p>
+                    </div>
                 </div>
-                <div class="card-chip">
-                    <span class="material-symbols-outlined" style="font-size: 1rem;">check</span>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/15 text-emerald-400 rounded-lg text-sm font-semibold">
+                    <span class="material-symbols-outlined text-base">check</span>
                     <span>Selesai</span>
                 </div>
             `;
@@ -307,14 +315,20 @@ export const ui = {
     switchTab(tabId) {
         // Remove active from all tabs and contents
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.remove('active', 'bg-cyan-500/15', 'text-cyan-400', 'border-r-4', 'border-cyan-400', 'rounded-l-xl', 'font-semibold');
+            el.classList.add('text-slate-400');
+        });
 
         // Add active to target
         const targetContent = document.getElementById(tabId);
         const targetNav = document.querySelector(`[data-target="${tabId}"]`);
 
         if (targetContent) targetContent.classList.add('active');
-        if (targetNav) targetNav.classList.add('active');
+        if (targetNav) {
+            targetNav.classList.add('active', 'bg-cyan-500/15', 'text-cyan-400', 'border-r-4', 'border-cyan-400', 'rounded-l-xl', 'font-semibold');
+            targetNav.classList.remove('text-slate-400');
+        }
     },
 
     showConfirm(message, onConfirm) {
@@ -324,16 +338,19 @@ export const ui = {
         const btnCancel = document.getElementById('btn-confirm-cancel');
 
         msgEl.textContent = message;
-        modal.classList.add('active');
+        modal.classList.remove('hidden');
+        modal.classList.add('!flex');
 
         // Clean up previous listeners
         const safeOnConfirm = async () => {
-            modal.classList.remove('active');
+            modal.classList.add('hidden');
+            modal.classList.remove('!flex');
             await onConfirm();
         };
 
         const safeOnCancel = () => {
-            modal.classList.remove('active');
+            modal.classList.add('hidden');
+            modal.classList.remove('!flex');
         };
 
         // Clone buttons to strip old listeners
@@ -345,5 +362,23 @@ export const ui = {
 
         newBtnYes.addEventListener('click', safeOnConfirm);
         newBtnCancel.addEventListener('click', safeOnCancel);
+    },
+
+    // Helper to open modal with Tailwind classes
+    openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('!flex');
+        }
+    },
+
+    // Helper to close modal with Tailwind classes
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('!flex');
+        }
     }
 };
